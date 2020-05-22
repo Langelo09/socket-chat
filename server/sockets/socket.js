@@ -27,6 +27,7 @@ io.on('connection', (client) => {
         //Dispara un evento que escuchan todas las personas conectadas a una misma sala cada que una persona entra o sale del chat
         //Y recuepera todas las personas conectadas al chat
         client.broadcast.to(data.sala).emit('listaPersonas', usuarios.getPersonasPorSala(data.sala));
+        client.broadcast.to(data.sala).emit('crearMensaje', crearMensaje('Administrador', `${data.nombre} se unió`));
 
         callback(usuarios.getPersonasPorSala(data.sala));
 
@@ -34,7 +35,7 @@ io.on('connection', (client) => {
 
     //Escucha cuando algun usuario llama el metodo de crearMensaje del archivo socket.chat.js [socket.emit('crearMensaje'] 
     //creando el mensaje del archivo utilidades.js
-    client.on('crearMensaje', (data) => {
+    client.on('crearMensaje', (data, callback) => {
 
         //Obtener el nombre e información d ela persona que envía el mensaje 
         let persona = usuarios.getPersona(client.id);
@@ -44,6 +45,8 @@ io.on('connection', (client) => {
 
         //Emitir a todas las personas el nuevo mensaje
         client.broadcast.to(persona.sala).emit('crearMensaje', mensaje);
+
+        callback(mensaje);
 
     });
 
